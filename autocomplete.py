@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod
 import re
 import string
 
@@ -24,8 +25,11 @@ class Candidate:
             self.word, self.confidence)
 
 
-class IWordStore:
-    pass
+class IWordStore(metaclass=ABCMeta):
+
+    @abstractmethod
+    def add(self, word):
+        pass
 
 
 class TrieWordStore(IWordStore):
@@ -33,6 +37,30 @@ class TrieWordStore(IWordStore):
         self.value = value
         self.weight = 0
         self.children = {} if children is None else children
+
+    def add(self, word):
+        """
+        Iterates through each letter in the word
+        starting at the root node check to see if each letter is already
+        represented in the trie
+
+        If the letter is represented skip to the next letter
+        If the letter is not represented create a new node and continue
+
+        :param word:
+        :return:
+        """
+        node = self
+        for letter in word:
+            if letter in node.children:
+                node = node.children[letter]
+            else:
+                new_node = TrieWordStore(value=letter)
+                node.children[letter] = new_node
+                node = new_node
+
+        # make sure to mark the last node as a word-end
+        node.weight += 1
 
     def __repr__(self):
         return "TrieWordStore(value='{}', weight={}, children={})".format(
@@ -42,7 +70,7 @@ class TrieWordStore(IWordStore):
 class AutoCompleteProvider:
 
     def __init__(self):
-        self.autocomplete_root = TrieWordStore()
+        self.autocomplete = TrieWordStore()
 
     def getWords(self, fragment):
         """
@@ -104,7 +132,7 @@ class AutoCompleteProvider:
         :param fragment:
         :return: None/Node
         """
-        node = self.autocomplete_root
+        node = self.autocomplete
         for letter in fragment:
             if letter in node.children:
                 node = node.children[letter]
@@ -136,28 +164,5 @@ class AutoCompleteProvider:
         words = self._tokenize_words(passage)
 
         for word in words:
-            self._add_word(word)
+            self.autocomplete.add(word)
 
-    def _add_word(self, word):
-        """
-        Iterates through each letter in the word
-        starting at the root node check to see if each letter is already
-        represented in the trie
-
-        If the letter is represented skip to the next letter
-        If the letter is not represented create a new node and continue
-
-        :param word:
-        :return:
-        """
-        node = self.autocomplete_root
-        for letter in word:
-            if letter in node.children:
-                node = node.children[letter]
-            else:
-                new_node = TrieWordStore(value=letter)
-                node.children[letter] = new_node
-                node = new_node
-
-        # make sure to mark the last node as a word-end
-        node.weight += 1
