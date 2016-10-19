@@ -31,6 +31,16 @@ class IWordStore(metaclass=ABCMeta):
     def add(self, word):
         pass
 
+    @abstractmethod
+    def matches(self, fragment):
+        """
+        Returns a list of candidate instances matching the fragment.
+
+        :param fragment:
+        :return: [*Candidate()]
+        """
+        pass
+
 
 class TrieWordStore(IWordStore):
     def __init__(self, value=None, children=None):
@@ -62,27 +72,7 @@ class TrieWordStore(IWordStore):
         # make sure to mark the last node as a word-end
         node.weight += 1
 
-    def __repr__(self):
-        return "TrieWordStore(value='{}', weight={}, children={})".format(
-            self.value, self.weight, self.children)
-
-
-class AutoCompleteProvider:
-
-    def __init__(self):
-        self.autocomplete = TrieWordStore()
-
-    def getWords(self, fragment):
-        """
-        Searches for word matches based on fragment.
-        Returns all matches as an array of Candidate instances
-
-        :param fragment:
-        :return: [*Candidate]
-        """
-        # case insensitive search
-        # and lowercase results
-        fragment = fragment.lower()
+    def matches(self, fragment):
         node = self._get_fragment_node(fragment)
         if node is None:
             return []
@@ -91,18 +81,28 @@ class AutoCompleteProvider:
         words = {}
 
         self._walk_path(node, path, words)
+
         words = [
             Candidate(word=fragment + suffix, confidence=num_occurrences)
             for suffix, num_occurrences in words.items()
         ]
+        return words
 
-        # order the words by confidence, most confident first
-        # this is inefficient but will help us order by confidence
-        # then alphabetically
-        return sorted(words, key=lambda x: (-x.confidence, x.word))
+    def _get_fragment_node(self, fragment):
+        """
+        Returns the root node of the fragement, or None if no
+        root node has been trained.
 
-    def _build_word_str(self, fragment, path, letter):
-        return fragment + ''.join([n.value for n in path]) + letter
+        :param fragment:
+        :return: None/Node
+        """
+        node = self
+        for letter in fragment:
+            if letter in node.children:
+                node = node.children[letter]
+            else:
+                return None
+        return node
 
     def _walk_path(self, node, path, words):
         """
@@ -124,21 +124,33 @@ class AutoCompleteProvider:
         if path:
             path.pop()
 
-    def _get_fragment_node(self, fragment):
+    def __repr__(self):
+        return "TrieWordStore(value='{}', weight={}, children={})".format(
+            self.value, self.weight, self.children)
+
+
+class AutoCompleteProvider:
+
+    def __init__(self):
+        self.autocomplete = TrieWordStore()
+
+    def getWords(self, fragment):
         """
-        Returns the root node of the fragement, or None if no
-        root node has been trained.
+        Searches for word matches based on fragment.
+        Returns all matches as an array of Candidate instances
+        Deldates to the autocomplete word store to find the matches.
 
         :param fragment:
-        :return: None/Node
+        :return: [*Candidate]
         """
-        node = self.autocomplete
-        for letter in fragment:
-            if letter in node.children:
-                node = node.children[letter]
-            else:
-                return None
-        return node
+        # case insensitive search
+        # and lowercase results
+        fragment = fragment.lower()
+        words = self.autocomplete.matches(fragment)
+        return sorted(words, key=lambda x: (-x.confidence, x.word))
+
+    def _build_word_str(self, fragment, path, letter):
+        return fragment + ''.join([n.value for n in path]) + letter
 
     def _tokenize_words(self, passage):
         """
