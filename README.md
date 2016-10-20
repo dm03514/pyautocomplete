@@ -11,13 +11,6 @@ Python 3.5.2 (default, Jul 17 2016, 00:00:00)
 ```python
 $ ipython
 Python 3.5.2 (default, Jul 17 2016, 00:00:00)
-Type "copyright", "credits" or "license" for more information.
-
-IPython 5.1.0 -- An enhanced Interactive Python.
-?         -> Introduction and overview of IPython's features.
-%quickref -> Quick reference.
-help      -> Python's own help system.
-object?   -> Details about 'object', use 'object??' for extra details.
 
 In [1]: from autocomplete import AutoCompleteProvider
 
