@@ -55,13 +55,14 @@ OK
 ```
 
 **Design**
+
 The AutoCompleteProvider is a wrapper around a word store `IWordStore`.  For the
 initial implementation a Trie was chosen.  To create a new implementation, implement
 the `IWordStore` interface, which requires 2 methods:
 - `void add(String word)` - adds a word to the word store
 - `List<Candidate> matches(String fragement)` - returns all Candidate matches for a given fragment
 
-
+**Instructions**
 We are developing a keyboard autocomplete algorithm to be used in various mobile devices. This algorithm will analyze the passages typed by the user in order to suggest a set of candidate autocomplete words given a word fragment.
 
 We need you to write the algorithm that will learn the words typed by the user over time and then determine a ranked list of autocomplete candidates given a word fragment (you should ignore capitalization when providing suggestions). The algorithm will be trained in an online manner, meaning that additional training passages can be submitted and incorporated into the algorithm at the same time as the algorithm is being used to provide autocomplete suggestions. Ideally, the accuracy of the algorithm will improve over time as more and more training passages are incorporated. Due to the deployment environment for this algorithm, efficiency is critical. The data structure utilized by your algorithm should be optimized for space and time. We have provided a specification [1] and a sample passage [2] along with example input and output and would like you to provide the implementation.
