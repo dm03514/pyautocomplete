@@ -7,7 +7,6 @@ Python 3.5.2 (default, Jul 17 2016, 00:00:00)
 ```
 
 **Usage**
-Training on ~100,000 words is near instantaneous.
 
 ```python
 $ ipython
