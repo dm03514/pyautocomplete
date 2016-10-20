@@ -41,7 +41,7 @@ class AutocompleteTestCase(unittest.TestCase):
             Candidate(word='this', confidence=1)
         ])
 
-    def test_multiple_matches_th(self):
+    def test_multiple_matches_multiple_weights(self):
         autocomplete = AutoCompleteProvider()
         autocomplete.train("The third thing that I need to tell you is that this thing does not think thoroughly.")
         matches = autocomplete.getWords('th')
