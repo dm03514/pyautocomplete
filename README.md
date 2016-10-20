@@ -70,13 +70,15 @@ We need you to write the algorithm that will learn the words typed by the user o
 
 [1] INTERFACE SPECIFICATION
 
-Candidate
-    - `String getWord()` : returns the autocomplete candidate
-    - `Integer getConfidence()` : returns the confidence* for the candidate
+Candidate:
+
+- `String getWord()` : returns the autocomplete candidate
+- `Integer getConfidence()` : returns the confidence* for the candidate
 
 AutocompleteProvider
-    - `List<Candidate> getWords(String fragment)` : returns list of candidates ordered by confidence*
-    - `void train(String passage)` : trains the algorithm with the provided passage
+
+- `List<Candidate> getWords(String fragment)` : returns list of candidates ordered by confidence*
+- `void train(String passage)` : trains the algorithm with the provided passage
 
 * Confidence is the likelihood/relevance of an individual word relative to the other words being returned by the autocomplete provider. If two words are equally likely, they should have the same confidence. If one is more likely, it should have a higher confidence.
 
