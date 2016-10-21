@@ -149,9 +149,6 @@ class AutoCompleteProvider:
         words = self.autocomplete.matches(fragment)
         return sorted(words, key=lambda x: (-x.confidence, x.word))
 
-    def _build_word_str(self, fragment, path, letter):
-        return fragment + ''.join([n.value for n in path]) + letter
-
     def _tokenize_words(self, passage):
         """
         Cleans a string of punctuation and splits on spaces.
